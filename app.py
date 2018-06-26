@@ -1,21 +1,39 @@
 from flask import Flask, render_template, request
 import os
+
+__author__ = 'Todd Robbins'
+
 app = Flask(__name__)
 
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 # https://www.youtube.com/watch?v=bxFaa_FNdL4
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("upload.html")
+
+@app.route('/', methods=['POST'])
+def upload():
+    target = os.path.join(APP_ROOT, 'csv/')
+    print(target)
+    if not os.path.isdir(target) :
+        os.mkdir(target)
+    for file in request.files.getlist("file"):
+        print(file)
+        filename = file.filename
+        destination = "/".join([target, filename])
+        print(destination)
+        file.save(destination)
+    return render_template("complete.html")
+
+
+if __name__ == '__main__':
+    app.run(debug=True) #run(port=4555, debug=True)
 
 #@app.route('/<user>')
 #@app.route('/shopping')
 #def shopping():
 #    food = ["Cheese", "Tuna", "Beef"]
 #    return render_template("GraphTwoDimensions.html", food=food)
-
-
-if __name__ == '__main__':
-    app.run()
 
 # @ signifies a decorator - way to wrap a function and modifying its behavior
 # @app.route('/profile/<name>')
